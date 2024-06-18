@@ -5,7 +5,11 @@ def RollD():
     result = np.random.randint(1,7)
     return result
 
-def Init_Roll():
+def Init_Roll(starting_dices):
+    score = []
+    for d in range(starting_dices):
+        d = RollD()
+        score.append(d)
+    print(score)
 
-score1 = RollD()
-print(score1)
+Init_Roll(6)
