@@ -1,5 +1,5 @@
 Mec_Raide
-cautious,1
+cautious,0
 consistent,1
 attack,2
 

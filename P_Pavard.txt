@@ -1,5 +1,5 @@
 Pavard
-cautious,10
+cautious,1
 consistent,10
-attack,3
+attack,5
 

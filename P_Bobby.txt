@@ -1,4 +1,4 @@
 Bobby
-cautious,5
+cautious,1
 consistent,5
 attack,5
