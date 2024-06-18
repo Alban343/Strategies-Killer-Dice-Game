@@ -1,0 +1,5 @@
+Pavard
+safe,10
+stable,10
+attack,3
+

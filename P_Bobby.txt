@@ -1,0 +1,4 @@
+Bobby
+safe,5
+stable,5
+attack,5
