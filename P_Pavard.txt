@@ -1,5 +1,5 @@
 Pavard
-safe,10
-stable,10
+cautious,10
+consistent,10
 attack,3
 

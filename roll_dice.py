@@ -2,18 +2,17 @@ import numpy as np
 import pandas as pd
 
 # PLAYERS
-players = ['Bobby', 'Pavard', 'Ronaldinho']
+players = ['Bobby', 'Pavard', 'Ronaldinho', 'Mec_Raide']
 P_stats_d = {}
 for p in players:
     stat = open(str(f'P_{p}.txt'), 'r')
     line = []
     for l in stat:
         line.append(l.replace('\n',''))
-    P_stats_d[line[0]] = [line[1].split(',')[1],line[2].split(',')[1],line[3].split(',')[1]]
+    P_stats_d[line[0]] = [30, int(line[1].split(',')[1]), int(line[2].split(',')[1]), int(line[3].split(',')[1])]
     stat.close()
-
-P_stats = pd.DataFrame(P_stats_d)
-print(P_stats)
+col_names = ['health', 'cautious','consistent','attack']
+P_stats = pd.DataFrame(P_stats_d, index=col_names)
 
 # ROLL THE DICES
 def RollD():
@@ -27,5 +26,7 @@ def Init_Roll(starting_dices):
     for d in range(starting_dices):
         d = RollD()
         score.append(d)
-    print(score)
+    return score
 
+
+print(Init_Roll(Starting_dices))

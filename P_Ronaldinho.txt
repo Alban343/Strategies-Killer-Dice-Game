@@ -1,4 +1,4 @@
 Ronaldinho
-safe,0
-stable,3
+cautious,1
+consistent,3
 attack,10
