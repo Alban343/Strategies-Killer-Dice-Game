@@ -102,10 +102,7 @@ def filter_hi(list, player):
         if filtered_hi_down == []:
             return filtered_hi_up
         else:
-            if P_stats.loc['consistent', player] >= np.random.rand()*10:
-                return filtered_hi_up
-            else:
-                return filtered_hi_down
+            return filtered_hi_up, filtered_hi_down
 
 
 
@@ -144,8 +141,20 @@ def player_plays(player):
                 print(f'le joueur peu précautionneux va devoir se contenter de pas grand chose : {decision}')
                 # Cod non cautious player choix 5 ou 2 (fonction ?)
     else:
-        for d in decision:
-            choix.append(d)
+        if len(decision) == 2 and type(decision[0]) == list:
+            print(f'decision contient bien 2 listes >>> {decision}')
+            if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
+                for i in decision[0]:
+                    choix.append(i)
+                print('Le joueur a choisi la meilleure option')
+            else:
+                for i in decision[1]:
+                    choix.append(i)
+                print("Le joueur a activé le monde rock'n'roll")
+        else:
+            for i in decision:
+                choix.append(i)
+
         #Coder ici une propriété de consistent pour quelqu'un qui voudrait ajouter un dé assez fort
         
         # 2ND RUN
