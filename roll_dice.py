@@ -128,8 +128,21 @@ def player_plays(player):
             if hidot_bet == True:
                 choix.append(4)
         else:
-            print(f'le joueur va devoir se contenter de pas grand chose : {decision}')
-            #Coder la fonction pour choisir 5 ou 2
+            if P_stats.loc['cautious', player]:
+                if hidot_bet:
+                    if 5 in decision:
+                        choix.append(5)
+                    else:
+                        choix.append(2)
+                else:
+                    if 2 in decision:
+                        choix.append(2)
+                    else:
+                        choix.append(5)
+            else:
+
+                print(f'le joueur peu précautionneux va devoir se contenter de pas grand chose : {decision}')
+                # Cod non cautious player choix 5 ou 2 (fonction ?)
     else:
         for d in decision:
             choix.append(d)
@@ -137,10 +150,17 @@ def player_plays(player):
         
         # 2ND RUN
         print(f'le joueur a choisi : {choix}')
+        print(f'nombre de dés choisis : {len(choix)}')
         if np.mean(choix) < 3:
             hidot_bet = False
         if np.mean(choix) > 4:
             hidot_bet = True
+        
+        if len(choix) == 6:
+            return choix
+        #2ND RUN
+
+        
     print(hidot_bet)
 
     for d in res:
