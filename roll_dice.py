@@ -108,7 +108,7 @@ def filter_hi(list, player):
 
 # PLAYER PLAYS
 
-player = 'Ronaldinho'
+player = 'Mec_Raide'
 def player_plays(player):
     hidot_bet = True
     if np.random.rand() < 0.5:
@@ -136,21 +136,43 @@ def player_plays(player):
                         choix.append(2)
                     else:
                         choix.append(5)
-            else:
 
-                print(f'le joueur peu précautionneux va devoir se contenter de pas grand chose : {decision}')
-                # Cod non cautious player choix 5 ou 2 (fonction ?)
+            #Joueur cautious = false pour du 5|2
+            else:
+                if len(decision) == 2 and type(decision[0]) == list:
+                    if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
+                        if hidot_bet:
+                            if 5 in decision:
+                                choix.append(5)
+                            else:
+                                choix.append(2)
+                        else:
+                            if 2 in decision:
+                                choix.append(2)
+                            else:
+                                choix.append(5)
+                    else:
+                        if len(decision[0]) > len(decision[1]):
+                            for i in decision[0]:
+                                choix.append(i)
+                        else:
+                            for i in decision[1]:
+                                choix.append(i)
+                else:
+                    if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
+                        choix.append(decision[0])
+                    else:
+                        for i in decision:
+                            choix.append(i)
+    # Joueurs pour le 6|1
     else:
         if len(decision) == 2 and type(decision[0]) == list:
-            print(f'decision contient bien 2 listes >>> {decision}')
             if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
                 for i in decision[0]:
                     choix.append(i)
-                print('Le joueur a choisi la meilleure option')
             else:
                 for i in decision[1]:
                     choix.append(i)
-                print("Le joueur a activé le monde rock'n'roll")
         else:
             for i in decision:
                 choix.append(i)
@@ -165,12 +187,14 @@ def player_plays(player):
         if np.mean(choix) > 4:
             hidot_bet = True
         
-        if len(choix) == 6:
-            return choix
-        #2ND RUN
-
+    if len(choix) == 6:
+        return choix
+    
+    #2ND RUN
+    if len(choix) != 6:
+        print('le tour n\'est pas terminé !!!')
         
-    print(hidot_bet)
+    print(f'le joueur est en train de parier haut: {hidot_bet}')
 
     for d in res:
         print(d)
