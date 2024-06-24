@@ -28,7 +28,7 @@ def Hand_Roll(starting_dices):
         score.append(d)
     return score
 
-# DECISION FILTERS
+# DECISION FILTERS -----------------------------------------------
 def filter_uncautious_greed(chosen, list, player):
     shrink_list = []
     suggestion = []
@@ -70,10 +70,10 @@ def filter_uncautious_greed(chosen, list, player):
         return ['X']
     
 
-def filter_lo_no_up(list, player):
+def filter_lo(list):
     count_twos = list.count(2)
     count_fives = list.count(5)
-    print(count_twos, count_fives)
+
     if count_twos == 0 and count_fives == 0:
         return ['X']
     
@@ -144,27 +144,35 @@ def filter_hi(list, player):
         else:
             return filtered_hi_up, filtered_hi_down
 
-
+# END DECISION FILTERS -------------------------------------------
 
 # PLAYER PLAYS
 
-player = 'Ronaldinho'
+player = 'Pavard'
 def player_plays(player):
     hidot_bet = True
     if np.random.rand() < 0.5:
         hidot_bet = False
     choix = []
+
+    # 1st RUN ----------------------------------------------------
     res = Hand_Roll(starting_dices)
-    #res = [3,1,1,1,2,3]
+    #res = [6,4,4,4,4,4]
     decision = filter_hi(res, player)
-    
+
     if decision == ['X']:
-        decision = filter_lo_no_up(res, player)
+        decision = filter_lo(res)
         if decision == ['X']:
             if hidot_bet == False:
-                choix.append(3)
-            if hidot_bet == True:
-                choix.append(4)
+                if 3 in res:
+                    choix.append(3)
+                else:
+                    choix.append(4)
+            elif hidot_bet == True:
+                if 4 in res:
+                    choix.append(4)
+                else:
+                    choix.append(3)
         else:
             if P_stats.loc['cautious', player]:
                 if hidot_bet:
@@ -234,24 +242,27 @@ def player_plays(player):
                 for i in greed:
                     choix.append(i)
 
-        
-    # END OF 1ST RUN
-    print(f'{player} a choisi : {choix}')
-    print(f'nombre de dés choisis : {len(choix)}')
-    if np.mean(choix) < 3:
+            # END OF 1ST RUN
+    if np.mean(choix) < 3.5:
         hidot_bet = False
-    if np.mean(choix) > 4:
+    if np.mean(choix) > 3.5:
         hidot_bet = True
         
     if len(choix) == 6:
         return choix
-    if len(choix) != 6:
-        print('le tour n\'est pas terminé !!!')
-    
-    # 2ND RUN
+        
+    # 2ND RUN ----------------------------------------------------
+    print(f'Les résultats du premier jet de dés : {res}')
     print(f'{player} est en train de parier haut: {hidot_bet}')
+    print(f'{player} a choisi au premier tour : {choix}')
+    print(f'nombre de dés choisis : {len(choix)}')
 
-    for d in res:
-        print(d)
+    res = Hand_Roll(starting_dices - len(choix))
+    #res = [1,1,1,1,5]
+    decision = 'nouveaux filtres'
+    #Coder un filtre général et deux filtres situationnels
+
+    print(f'A ce moment {player} a choisi : {choix}')
+    print(f'Les résultats du second jet de dés : {res}')
 
 player_plays(player)
