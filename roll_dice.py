@@ -28,7 +28,47 @@ def Hand_Roll(starting_dices):
         score.append(d)
     return score
 
-# DECISIONS FILTER
+# DECISION FILTERS
+def filter_uncautious_greed(chosen, list, player):
+    shrink_list = []
+    suggestion = []
+    for i in list:
+        if i not in [1, 6]:
+            shrink_list.append(i)
+    for i in shrink_list:
+        if ((np.sum(chosen) + i)/(len(chosen)+1)) > 5:
+            suggestion.append(i)
+        elif ((np.sum(chosen) + i)/(len(chosen)+1)) < 2:
+            suggestion.append(i)
+
+    possible_avg = (np.sum([np.sum(chosen) , np.sum(suggestion)]))/(len(chosen) + len(suggestion))
+
+    if P_stats.loc['consistent', player]*1.5 >= np.random.rand()*10:
+        if len(chosen) + len(suggestion) == 6 and possible_avg > 5:
+            return suggestion
+        elif len(chosen) + len(suggestion) == 6 and possible_avg < 2:
+            return suggestion
+        
+    if 2 in suggestion or 3 in suggestion:
+        suggestion.sort(reverse=True)
+    else:
+        suggestion.sort()
+
+    if possible_avg < 5.31 and possible_avg > 5:
+        del(suggestion[0])
+    elif possible_avg > 1.59 and possible_avg < 2:
+        del(suggestion[0])
+
+    if 3 in suggestion and 2 not in suggestion:
+        return ['X']
+    if 4 in suggestion and 5 not in suggestion:
+        return ['X']
+
+    if P_stats.loc['consistent', player] >= np.random.rand()*10 and len(suggestion) > 0:
+        return suggestion
+    else:
+        return ['X']
+    
 
 def filter_lo_no_up(list, player):
     count_twos = list.count(2)
@@ -108,13 +148,14 @@ def filter_hi(list, player):
 
 # PLAYER PLAYS
 
-player = 'Mec_Raide'
+player = 'Ronaldinho'
 def player_plays(player):
     hidot_bet = True
     if np.random.rand() < 0.5:
         hidot_bet = False
     choix = []
     res = Hand_Roll(starting_dices)
+    res = [3,1,1,1,2,3]
     decision = filter_hi(res, player)
     
     if decision == ['X']:
@@ -166,35 +207,49 @@ def player_plays(player):
                             choix.append(i)
     # Joueurs pour le 6|1
     else:
-        if len(decision) == 2 and type(decision[0]) == list:
-            if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
+        if P_stats.loc['cautious', player]:
+            if len(decision) == 2 and type(decision[0]) == list:
                 for i in decision[0]:
                     choix.append(i)
             else:
-                for i in decision[1]:
+                for i in decision:
                     choix.append(i)
+            print(f'{player} est prudent. Il a choisi {choix} au premier jet.')
         else:
-            for i in decision:
-                choix.append(i)
+            if len(decision) == 2 and type(decision[0]) == list:
+                if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
+                    for i in decision[0]:
+                        choix.append(i)
+                else:
+                    for i in decision[1]:
+                        choix.append(i)
+            else:
+                for i in decision:
+                    choix.append(i)
 
-        #Coder ici une propriété de consistent pour quelqu'un qui voudrait ajouter un dé assez fort
+            greed = filter_uncautious_greed(choix, res, player)
+            if greed == ['X']:
+                pass
+            else:
+                for i in greed:
+                    choix.append(i)
+
         
-        # 2ND RUN
-        print(f'le joueur a choisi : {choix}')
-        print(f'nombre de dés choisis : {len(choix)}')
-        if np.mean(choix) < 3:
-            hidot_bet = False
-        if np.mean(choix) > 4:
-            hidot_bet = True
+    # END OF 1ST RUN
+    print(f'{player} a choisi : {choix}')
+    print(f'nombre de dés choisis : {len(choix)}')
+    if np.mean(choix) < 3:
+        hidot_bet = False
+    if np.mean(choix) > 4:
+        hidot_bet = True
         
     if len(choix) == 6:
         return choix
-    
-    #2ND RUN
     if len(choix) != 6:
         print('le tour n\'est pas terminé !!!')
-        
-    print(f'le joueur est en train de parier haut: {hidot_bet}')
+    
+    # 2ND RUN
+    print(f'{player} est en train de parier haut: {hidot_bet}')
 
     for d in res:
         print(d)
