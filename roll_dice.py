@@ -155,7 +155,7 @@ def player_plays(player):
         hidot_bet = False
     choix = []
     res = Hand_Roll(starting_dices)
-    res = [3,1,1,1,2,3]
+    #res = [3,1,1,1,2,3]
     decision = filter_hi(res, player)
     
     if decision == ['X']:
