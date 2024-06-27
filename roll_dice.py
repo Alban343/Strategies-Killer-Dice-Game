@@ -21,11 +21,11 @@ def RollD():
 
 starting_dices = 6
 def Hand_Roll(starting_dices):
-    score = []
+    res = []
     for d in range(starting_dices):
         d = RollD()
-        score.append(d)
-    return score
+        res.append(d)
+    return res
 
 # DECISION FILTERS -----------------------------------------------
 def main_filter(hi_dot_bet, chosen, list, player):
@@ -42,7 +42,6 @@ def main_filter(hi_dot_bet, chosen, list, player):
                     if P_stats.loc['consistent', player]*0.8 >= np.random.rand()*10:
                         for i in list:
                             suggestion.append(i)
-                        print(f'MF : {player} craque son slip et embarque un paquet de dés ! {suggestion}')
                         return suggestion
                 return suggestion
             else:
@@ -60,7 +59,6 @@ def main_filter(hi_dot_bet, chosen, list, player):
                     if P_stats.loc['consistent', player]*0.8 >= np.random.rand()*10:
                         for i in list:
                             suggestion.append(i)
-                        print(f'MF : {player} craque son slip et embarque un paquet de dés ! {suggestion}')
                         return suggestion
                 return suggestion
             else:
@@ -80,7 +78,6 @@ def main_filter(hi_dot_bet, chosen, list, player):
                     if ((np.sum(chosen) + i)/(len(chosen)+1)) > 5.5:
                         if P_stats.loc['consistent', player] >= np.random.rand()*10:
                             suggestion.append(i)
-                print(f'MF : {player} a choisi : {suggestion}')
                 return suggestion
             else:
                 if len(chosen) == 1 and list.count(1) >= 2:
@@ -108,7 +105,6 @@ def main_filter(hi_dot_bet, chosen, list, player):
                     if ((np.sum(chosen) + i)/(len(chosen)+1)) < 1.5:
                         if P_stats.loc['consistent', player] >= np.random.rand()*10:
                             suggestion.append(i)
-                print(f'MF : {player} a choisi : {suggestion}')
                 return suggestion
             else:
                 if len(chosen) == 1 and list.count(6) >= 2:
@@ -347,7 +343,7 @@ def player_plays(player):
     if len(choix) == 6:
         return {
             'run' : 1,
-            'score' : np.sum(choix),
+            'score' : int(np.sum(choix)),
             'decision' : choix,
             'acrobatie' : acrobatie
             }
@@ -366,7 +362,7 @@ def player_plays(player):
             print(f'{player} se met très bien dès le deuxième tour !')
             return {
                 'run' : 2,
-                'score' : np.sum(choix),
+                'score' : int(np.sum(choix)),
                 'decision' : choix,
                 'acrobatie' : acrobatie
                 }
@@ -380,7 +376,7 @@ def player_plays(player):
             if len(choix) == 6:
                 return {
                     'run' : 3,
-                    'score' : np.sum(choix),
+                    'score' : int(np.sum(choix)),
                     'decision' : choix,
                     'acrobatie' : acrobatie
                     }
@@ -394,7 +390,7 @@ def player_plays(player):
                 if len(choix) == 6:
                     return {
                         'run' : 4,
-                        'score' : np.sum(choix),
+                        'score' : int(np.sum(choix)),
                         'decision' : choix,
                         'acrobatie' : acrobatie
                         }
@@ -408,7 +404,7 @@ def player_plays(player):
                     if len(choix) == 6:
                         return {
                             'run' : 5,
-                            'score' : np.sum(choix),
+                            'score' : int(np.sum(choix)),
                             'decision' : choix,
                             'acrobatie' : acrobatie
                             }
@@ -422,7 +418,7 @@ def player_plays(player):
                         if len(choix) == 6:
                             return {
                                 'run' : 6,
-                                'score' : np.sum(choix),
+                                'score' : int(np.sum(choix)),
                                 'decision' : choix,
                                 'acrobatie' : acrobatie
                                 }
