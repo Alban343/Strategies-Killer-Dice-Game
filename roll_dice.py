@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-# PLAYERS
+# PLAYERS, GAME, STATS ------------------------------------------
 players = ['Bobby', 'Pavard', 'Ronaldinho', 'Mec_Raide']
 P_stats_d = {}
 for p in players:
@@ -13,9 +13,8 @@ for p in players:
     stat.close()
 col_names = ['health', 'cautious','consistent','attack']
 P_stats = pd.DataFrame(P_stats_d, index=col_names)
-print(P_stats)
 
-# ROLL THE DICES
+# ROLL THE DICES -------------------------------------------------
 def RollD():
     result = np.random.randint(1,7)
     return result
@@ -29,6 +28,104 @@ def Hand_Roll(starting_dices):
     return score
 
 # DECISION FILTERS -----------------------------------------------
+def main_filter(hi_dot_bet, chosen, list, player):
+    suggestion = []
+    if P_stats.loc['cautious', player]:
+        if hi_dot_bet:
+            for i in list:
+                if i == 6:
+                    suggestion.append(i)
+            if len(suggestion) > 0:
+                for i in suggestion:
+                    list.remove(i)
+                if np.sum(chosen) + np.sum(suggestion) + np.sum(list) > 30 and np.median(list) > 4:
+                    if P_stats.loc['consistent', player]*0.8 >= np.random.rand()*10:
+                        for i in list:
+                            suggestion.append(i)
+                        print(f'MF : {player} craque son slip et embarque un paquet de dés ! {suggestion}')
+                        return suggestion
+                return suggestion
+            else:
+                maxi = max(list)
+                suggestion.append(maxi)
+                return suggestion
+        else:
+            for i in list:
+                if i == 1:
+                    suggestion.append(i)
+            if len(suggestion) > 0:
+                for i in suggestion:
+                    list.remove(i)
+                if np.sum(chosen) + np.sum(suggestion) + np.sum(list) < 12 and np.median(list) < 3:
+                    if P_stats.loc['consistent', player]*0.8 >= np.random.rand()*10:
+                        for i in list:
+                            suggestion.append(i)
+                        print(f'MF : {player} craque son slip et embarque un paquet de dés ! {suggestion}')
+                        return suggestion
+                return suggestion
+            else:
+                mini = min(list)
+                suggestion.append(mini)
+                return suggestion
+    # NON CAUTIOUS PLAYER
+    else:
+        if hi_dot_bet:
+            for i in list:
+                if i == 6:
+                    suggestion.append(i)
+            if len(suggestion) > 0:
+                for i in suggestion:
+                    list.remove(i)
+                for i in list:
+                    if ((np.sum(chosen) + i)/(len(chosen)+1)) > 5.5:
+                        if P_stats.loc['consistent', player] >= np.random.rand()*10:
+                            suggestion.append(i)
+                print(f'MF : {player} a choisi : {suggestion}')
+                return suggestion
+            else:
+                if len(chosen) == 1 and list.count(1) >= 2:
+                    if P_stats.loc['consistent', player] >= np.random.rand()*10:
+                        for i in list:
+                            if i == 1:
+                                suggestion.append(i)
+                            elif i == 2:
+                                if P_stats.loc['consistent', player]*0.3 >= np.random.rand()*10:
+                                    suggestion.append(i) 
+                if len(suggestion) > 0:
+                    return suggestion
+                else:
+                    maxi = max(list)
+                    suggestion.append(maxi)
+                    return suggestion
+        else:
+            for i in list:
+                if i == 1:
+                    suggestion.append(i)
+            if len(suggestion) > 0:
+                for i in suggestion:
+                    list.remove(i)
+                for i in list:
+                    if ((np.sum(chosen) + i)/(len(chosen)+1)) < 1.5:
+                        if P_stats.loc['consistent', player] >= np.random.rand()*10:
+                            suggestion.append(i)
+                print(f'MF : {player} a choisi : {suggestion}')
+                return suggestion
+            else:
+                if len(chosen) == 1 and list.count(6) >= 2:
+                    if P_stats.loc['consistent', player] >= np.random.rand()*10:
+                        for i in list:
+                            if i == 6:
+                                suggestion.append(i)
+                            elif i == 5:
+                                if P_stats.loc['consistent', player]*0.3 >= np.random.rand()*10:
+                                    suggestion.append(i)
+                if len(suggestion) > 0:
+                    return suggestion
+                else:
+                    mini = min(list)
+                    suggestion.append(mini)
+                    return suggestion
+
 def filter_uncautious_greed(chosen, list, player):
     shrink_list = []
     suggestion = []
@@ -143,21 +240,24 @@ def filter_hi(list, player):
             return filtered_hi_up
         else:
             return filtered_hi_up, filtered_hi_down
-
 # END DECISION FILTERS -------------------------------------------
 
-# PLAYER PLAYS
+# PLAYING FUNCTIONS ----------------------------------------------
+def set_bet(choix_tac):
+    if np.mean(choix_tac) < 3.5:
+        return False
+    elif np.mean(choix_tac) > 3.5:
+        return True
 
-player = 'Pavard'
 def player_plays(player):
     hidot_bet = True
+    acrobatie = False
     if np.random.rand() < 0.5:
         hidot_bet = False
     choix = []
 
-    # 1st RUN ----------------------------------------------------
+    # 1st RUN -----------------------
     res = Hand_Roll(starting_dices)
-    #res = [6,4,4,4,4,4]
     decision = filter_hi(res, player)
 
     if decision == ['X']:
@@ -222,7 +322,6 @@ def player_plays(player):
             else:
                 for i in decision:
                     choix.append(i)
-            print(f'{player} est prudent. Il a choisi {choix} au premier jet.')
         else:
             if len(decision) == 2 and type(decision[0]) == list:
                 if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
@@ -242,27 +341,95 @@ def player_plays(player):
                 for i in greed:
                     choix.append(i)
 
-            # END OF 1ST RUN
-    if np.mean(choix) < 3.5:
-        hidot_bet = False
-    if np.mean(choix) > 3.5:
-        hidot_bet = True
-        
+    hidot_bet = set_bet(choix)
+    test_acrobatie = set_bet(choix)
+    
     if len(choix) == 6:
-        return choix
-        
-    # 2ND RUN ----------------------------------------------------
-    print(f'Les résultats du premier jet de dés : {res}')
-    print(f'{player} est en train de parier haut: {hidot_bet}')
-    print(f'{player} a choisi au premier tour : {choix}')
-    print(f'nombre de dés choisis : {len(choix)}')
+        return {
+            'run' : 1,
+            'score' : np.sum(choix),
+            'decision' : choix,
+            'acrobatie' : acrobatie
+            }
+    else:
+        # 2ND RUN -----------------------------------
+        res = Hand_Roll(starting_dices - len(choix))
+        decision = main_filter(hidot_bet, choix, res, player)
+        for d in decision:
+            choix.append(d)
 
-    res = Hand_Roll(starting_dices - len(choix))
-    #res = [1,1,1,1,5]
-    decision = 'nouveaux filtres'
-    #Coder un filtre général et deux filtres situationnels
+        hidot_bet = set_bet(choix)
+        if hidot_bet != test_acrobatie:
+            acrobatie = True
 
-    print(f'A ce moment {player} a choisi : {choix}')
-    print(f'Les résultats du second jet de dés : {res}')
+        if len(choix) == 6:
+            print(f'{player} se met très bien dès le deuxième tour !')
+            return {
+                'run' : 2,
+                'score' : np.sum(choix),
+                'decision' : choix,
+                'acrobatie' : acrobatie
+                }
+        else:
+            #3RD RUN -----------------------------------
+            res = Hand_Roll(starting_dices - len(choix))
+            decision = main_filter(hidot_bet, choix, res, player)
+            for d in decision:
+                choix.append(d)
 
-player_plays(player)
+            if len(choix) == 6:
+                return {
+                    'run' : 3,
+                    'score' : np.sum(choix),
+                    'decision' : choix,
+                    'acrobatie' : acrobatie
+                    }
+            else:
+                #4TH RUN -----------------------------------
+                res = Hand_Roll(starting_dices - len(choix))
+                decision = main_filter(hidot_bet, choix, res, player)
+                for d in decision:
+                    choix.append(d)
+
+                if len(choix) == 6:
+                    return {
+                        'run' : 4,
+                        'score' : np.sum(choix),
+                        'decision' : choix,
+                        'acrobatie' : acrobatie
+                        }
+                else:
+                    #5TH RUN -----------------------------------
+                    res = Hand_Roll(starting_dices - len(choix))
+                    decision = main_filter(hidot_bet, choix, res, player)
+                    for d in decision:
+                        choix.append(d)
+
+                    if len(choix) == 6:
+                        return {
+                            'run' : 5,
+                            'score' : np.sum(choix),
+                            'decision' : choix,
+                            'acrobatie' : acrobatie
+                            }
+                    else:
+                        #LAST RUN ----------------------------------
+                        res = Hand_Roll(starting_dices - len(choix))
+                        decision = main_filter(hidot_bet, choix, res, player)
+                        for d in decision:
+                            choix.append(d)
+
+                        if len(choix) == 6:
+                            return {
+                                'run' : 6,
+                                'score' : np.sum(choix),
+                                'decision' : choix,
+                                'acrobatie' : acrobatie
+                                }
+                        else:
+                            print(f'Error')
+# END PLAYING FUNCTIONS ----------------------------------------------
+
+player = 'Pavard'
+score = player_plays(player)
+print(f'{player} nous régale : {score}')
