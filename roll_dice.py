@@ -359,7 +359,6 @@ def player_plays(player):
             acrobatie = True
 
         if len(choix) == 6:
-            print(f'{player} se met très bien dès le deuxième tour !')
             return {
                 'run' : 2,
                 'score' : int(np.sum(choix)),
@@ -428,4 +427,21 @@ def player_plays(player):
 
 player = 'Pavard'
 score = player_plays(player)
-print(f'{player} nous régale : {score}')
+#print(score)
+
+# QUELQUES TESTS STATISTIQUES ---------------------------------------------
+score_dict = {}
+for i in range(10000):
+    score_dict[i] = player_plays('Pavard')
+score_dict_df = pd.DataFrame.from_dict(score_dict, orient='index')
+print(score_dict_df.head())
+
+print(score_dict_df[score_dict_df['acrobatie'] == True])
+
+def mean_col(col):
+    return col.mean()
+
+print(f'Petits dés, score moyen avec acrobatie : {score_dict_df[['score','run']][(score_dict_df['acrobatie'] == True)&(score_dict_df['score'] < 20)].agg(mean_col)}')
+print(f'Gros dés, score moyen avec acrobatie : {score_dict_df[['score','run']][(score_dict_df['acrobatie'] == True)&(score_dict_df['score'] > 20)].agg(mean_col)}')
+
+#print(f'Score moyen du premier dé : {(score_dict_df['score'].apply(lambda x: x[0])).agg(mean_col)}')
