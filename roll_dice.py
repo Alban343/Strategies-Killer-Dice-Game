@@ -304,7 +304,7 @@ def player_plays(player):
                             for i in decision[1]:
                                 choix.append(i)
                 else:
-                    if P_stats.loc['consistent', player]*2 >= np.random.rand()*10:
+                    if P_stats.loc['consistent', player]*1.2 >= np.random.rand()*10:
                         choix.append(decision[0])
                     else:
                         for i in decision:
@@ -425,23 +425,17 @@ def player_plays(player):
                             print(f'Error')
 # END PLAYING FUNCTIONS ----------------------------------------------
 
-player = 'Pavard'
+player = 'Bobby'
 score = player_plays(player)
 #print(score)
 
 # QUELQUES TESTS STATISTIQUES ---------------------------------------------
 score_dict = {}
 for i in range(10000):
-    score_dict[i] = player_plays('Pavard')
-score_dict_df = pd.DataFrame.from_dict(score_dict, orient='index')
-print(score_dict_df.head())
+    score_dict[i] = player_plays(player)
+ronaldinho_df = pd.DataFrame.from_dict(score_dict, orient='index')
+print(ronaldinho_df.head())
 
-print(score_dict_df[score_dict_df['acrobatie'] == True])
 
-def mean_col(col):
-    return col.mean()
-
-print(f'Petits dés, score moyen avec acrobatie : {score_dict_df[['score','run']][(score_dict_df['acrobatie'] == True)&(score_dict_df['score'] < 20)].agg(mean_col)}')
-print(f'Gros dés, score moyen avec acrobatie : {score_dict_df[['score','run']][(score_dict_df['acrobatie'] == True)&(score_dict_df['score'] > 20)].agg(mean_col)}')
-
-#print(f'Score moyen du premier dé : {(score_dict_df['score'].apply(lambda x: x[0])).agg(mean_col)}')
+# EXPORTER VERS UN CSV
+#ronaldinho_df.to_csv(f'{player}.csv')
