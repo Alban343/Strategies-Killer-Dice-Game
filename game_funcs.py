@@ -1,19 +1,6 @@
 import numpy as np
 import pandas as pd
 
-# PLAYERS, GAME, STATS ------------------------------------------
-players = ['Bobby', 'Pavard', 'Ronaldinho', 'Mec_Raide']
-P_stats_d = {}
-for p in players:
-    stat = open(str(f'P_{p}.txt'), 'r')
-    line = []
-    for l in stat:
-        line.append(l.replace('\n',''))
-    P_stats_d[line[0]] = [30, bool(int(line[1].split(',')[1])), int(line[2].split(',')[1]), int(line[3].split(',')[1])]
-    stat.close()
-col_names = ['health', 'cautious','consistent','attack']
-P_stats = pd.DataFrame(P_stats_d, index=col_names)
-
 # ROLL THE DICES -------------------------------------------------
 def RollD():
     result = np.random.randint(1,7)
@@ -28,7 +15,7 @@ def Hand_Roll(starting_dices):
     return res
 
 # DECISION FILTERS -----------------------------------------------
-def main_filter(hi_dot_bet, chosen, list, player):
+def main_filter(P_stats, hi_dot_bet, chosen, list, player):
     suggestion = []
     if P_stats.loc['cautious', player]:
         if hi_dot_bet:
@@ -122,7 +109,7 @@ def main_filter(hi_dot_bet, chosen, list, player):
                     suggestion.append(mini)
                     return suggestion
 
-def filter_uncautious_greed(chosen, list, player):
+def filter_uncautious_greed(P_stats, chosen, list, player):
     shrink_list = []
     suggestion = []
     for i in list:
@@ -199,7 +186,7 @@ def filter_lo(list):
         return filtered_lo_up, filtered_lo_down
 
 
-def filter_hi(list, player):
+def filter_hi(P_stats, list, player):
     count_ones = list.count(1)
     count_sixes = list.count(6)
 
@@ -245,7 +232,7 @@ def set_bet(choix_tac):
     elif np.mean(choix_tac) > 3.5:
         return True
 
-def player_plays(player):
+def player_plays(P_stats, player):
     hidot_bet = True
     acrobatie = False
     if np.random.rand() < 0.5:
@@ -425,17 +412,3 @@ def player_plays(player):
                             print(f'Error')
 # END PLAYING FUNCTIONS ----------------------------------------------
 
-player = 'Bobby'
-score = player_plays(player)
-#print(score)
-
-# QUELQUES TESTS STATISTIQUES ---------------------------------------------
-score_dict = {}
-for i in range(10000):
-    score_dict[i] = player_plays(player)
-ronaldinho_df = pd.DataFrame.from_dict(score_dict, orient='index')
-print(ronaldinho_df.head())
-
-
-# EXPORTER VERS UN CSV
-#ronaldinho_df.to_csv(f'{player}.csv')
