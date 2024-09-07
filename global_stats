@@ -1,23 +1,9 @@
 import pandas as pd
 import numpy as np
-import ast
-import game_funcs as gft
+import player_decision_funcs as pdf
+import game_funcs as gf
 
-players = ['pavard', 'ronaldinho']
-col_names = ['run', 'score', 'decision', 'acrobatie']
-pavard_df = pd.read_csv('Pavard.csv')
-pavard_df = pavard_df[col_names]
-pavard_df['decision'] = pavard_df['decision'].apply(ast.literal_eval)
-print(pavard_df.head())
-
-ronaldinho_df = pd.read_csv('Ronaldinho.csv')
-ronaldinho_df = ronaldinho_df[col_names]
-ronaldinho_df['decision'] = ronaldinho_df['decision'].apply(ast.literal_eval)
-print(ronaldinho_df.head())
-
-
-
-def summary_stats(player):
+def hand_stats(player):
     print(f'----- STATS {str.upper(player)} (10k Mains)-----')
 
     print(f'En 10k mains, Pavard a fait {pavard_df[pavard_df['acrobatie'] == True].shape[0]} Ronaldinhos')
@@ -31,20 +17,18 @@ def summary_stats(player):
     print(f'Petits dés, score moyen avec acrobatie : {pavard_df[['score','run']][(pavard_df['acrobatie'] == True)&(pavard_df['score'] < 20)].agg('mean')}')
     print(f'Gros dés, score moyen avec acrobatie : {pavard_df[['score','run']][(pavard_df['acrobatie'] == True)&(pavard_df['score'] > 20)].agg('mean')}')
 
-summary_stats('pavard')
-
 print(f'test quantile : {pavard_df['run'].quantile(0.5)}')
 
 player = 'Bobby'
-score = gft.player_plays(player)
-#print(score)
+score = pdf.player_plays(player)
+print(score)
 
 # QUELQUES TESTS STATISTIQUES ---------------------------------------------
 score_dict = {}
 for i in range(5):
-    score_dict[i] = gft.player_plays(player)
-ronaldinho_df = pd.DataFrame.from_dict(score_dict, orient='index')
-print(ronaldinho_df.head())
+    score_dict[i] = pdf.player_plays(player)
+score_df = pd.DataFrame.from_dict(score_dict, orient='index')
+print(score_df.head())
 
 
 # EXPORTER VERS UN CSV
