@@ -29,38 +29,51 @@ def play_game():
     boss = ''
     play_order = order(P_stats)
     print(f'L\'ordre de jeu est : {play_order}')
-    while ((P_stats.transpose()['health'] == 0).sum()) < (len(play_order) - 1) and rounds < 4:
-        print(f'joueurs morts : {(P_stats.transpose()['health'] == 0).sum()}')
+    while ((P_stats.transpose()['health'] == 0).sum()) < (len(play_order) - 1) and rounds < 10:
+        print(f'joueurs morts : {(P_stats.transpose()['health'] <= 0).sum()}')
         for i in range(4):
-            print(f'{play_order[i]} joue')
             current_player = str(play_order[i])
-            score = pdf.player_plays(P_stats, current_player)
-            print(score)
-            print(f'{current_player} a un score de {score['score']}')
-            if score['score'] == 12 or score['score'] == 30:
-                print(f'{current_player} ne s\'en sort pas trop mal !')
-                continue
-            elif score['score'] < 12 or score['score'] > 30:
-                if score['score'] < 12:
-                    attack = 12 - score['score']
-                    print(f'{current_player} va attaquer au {attack}')
-                    damages = pdf.player_attacks(P_stats, current_player, attack)
-                    print(f'{current_player} met sa fessée à {damages}')
+            if P_stats.loc['health', current_player] > 0:
+                print(f'{play_order[i]} a {P_stats.loc['health', current_player]} PV et se prépare à jouer')
+                score = pdf.player_plays(P_stats, current_player)
+                print(score)
+                print(f'{current_player} a un score de {score['score']}')
+                if score['score'] == 12 or score['score'] == 30:
+                    print(f'{current_player} ne s\'en sort pas trop mal !')
+                    continue
+                elif score['score'] < 12 or score['score'] > 30:
+                    if score['score'] < 12:
+                        attack = 12 - score['score']
+                        print(f'{current_player} va attaquer au {attack}')
+                        damages = pdf.player_attacks(P_stats, current_player, attack)
+                        print(f'{current_player} met sa fessée à {damages}')
+                        # Degats
+                        P_stats.loc['health', damages[0]] = P_stats.loc['health', damages[0]] - damages[1]
+                        print(f'{damages[0]} a {P_stats.loc['health', damages[0]]} points de vie restants')
+                        print(f'1 - {damages[0]}, 2 - {damages[1]}')
+                    else:
+                        attack = score['score'] - 30
+                        print(f'{current_player} va attaquer au {attack}')
+                        damages = pdf.player_attacks(P_stats, current_player, attack)
+                        print(f'{current_player} met sa fessée à {damages}')
+                        # Degats
+                        P_stats.loc['health', damages[0]] = P_stats.loc['health', damages[0]] - damages[1]
+                        print(f'{damages[0]} a {P_stats.loc['health', damages[0]]} points de vie restants')
                 else:
-                    attack = score['score'] - 30
-                    print(f'{current_player} va attaquer au {attack}')
-                    damages = pdf.player_attacks(P_stats, current_player, attack)
-                    print(f'{current_player} met sa fessée à {damages}')
+                    soit = [30 - score['score'], score['score'] - 12]
+                    dmg = min(soit)
+                    print(f'Ahlala, {current_player} se met {dmg} dégats tout seul {soit}')
+                    # Degats
+                    P_stats.loc['health', current_player] = P_stats.loc['health', current_player] - dmg
+                    print(f'{current_player} a {P_stats.loc['health', current_player]} points de vie restants')
             else:
-                soit = [30 - score['score'], score['score'] - 12]
-                dmg = min(soit)
-                print(f'Ahlala, {current_player} se met {dmg} dégats tout seul {soit}')
-
+                print(f'{current_player} est dead mort de chez muerto')
 
             print(f'Round {rounds}')
         rounds += 1
         boss = str(P_stats.loc['health'].idxmax())
         print(f'{boss} est le boss.')
+        print(P_stats)
 
 test = play_game()
 print(f'Ordre + selection dernier pl : {test}')

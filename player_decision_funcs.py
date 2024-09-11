@@ -417,23 +417,33 @@ def player_attacks(P_stats, player, attack):
     pick = []
     pick_len = 0
     odd = Hand_Roll(starting_dices)
+    #test
+    print(odd)
     for i in odd:
         if i == attack:
             pick.append(i)
     if len(pick) == pick_len or len(pick) == 6:
         damages = sum(pick)
+        #test
+        print(f'Pas de dégats... pick = {pick}')
     else:
         while len(pick) < 6:
             pick_len = len(pick)
             odd = Hand_Roll(starting_dices - pick_len)
+            #test
+            print(odd)
             for i in odd:
                 if i == attack:
                     pick.append(i)
             if len(pick) == pick_len or len(pick) == 6:
                 damages = sum(pick)
+                break
     
     victims = P_stats.transpose().sample(4, replace=False).index.to_list()
     victims.remove(player)
+    for i in victims:
+        if P_stats.loc['health', i] <= 0:
+            victims.remove(i)
     victim_stats = P_stats[victims]
     if P_stats.loc['attack', player] >= np.random.rand()*10:
         if victim_stats.loc['health'][victim_stats.loc['health'] < damages].count() > 1:
