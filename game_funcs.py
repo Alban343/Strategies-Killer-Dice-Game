@@ -29,7 +29,7 @@ def play_game():
     boss = ''
     play_order = order(P_stats)
     print(f'L\'ordre de jeu est : {play_order}')
-    while ((P_stats.transpose()['health'] == 0).sum()) < (len(play_order) - 1) and rounds < 10:
+    while ((P_stats.transpose()['health'] <= 0).sum()) < (len(play_order) - 1):
         print(f'joueurs morts : {(P_stats.transpose()['health'] <= 0).sum()}')
         for i in range(4):
             current_player = str(play_order[i])
@@ -74,7 +74,16 @@ def play_game():
         boss = str(P_stats.loc['health'].idxmax())
         print(f'{boss} est le boss.')
         print(P_stats)
+    return boss
 
 test = play_game()
-print(f'Ordre + selection dernier pl : {test}')
+print(f'Rapport de partie : {test}')
+
+dix_mille_games = []
+for i in range(10000):
+    vainqueur = play_game()
+    dix_mille_games.append(vainqueur)
+dmg_df = pd.DataFrame(dix_mille_games, columns=['vainqueurs'])
+print(dmg_df)
+print(dmg_df.value_counts())
 
